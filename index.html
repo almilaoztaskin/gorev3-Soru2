@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soru2</title>
+    <style>
+        #box input {
+            width: 50px;
+            height: 15px;
+            display: inline-block;
+        }
+
+        #box2 input {
+            width: 50px;
+            height: 15px;
+            display: inline-block;
+        }
+
+        #message {
+            display: none;
+            margin-top: 10px;
+            position: absolute;
+            font-size: 12px;
+        }
+
+        #bilinenNum {
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Sayısal Loto Oyunu</h1>
+
+    <p>Aşağıdaki inputlara tahminlerini giriniz;</p>
+
+    <div id="box">
+        <input type="number" id="num1" onchange="checkDuplicates(this)">
+        <input type="number" id="num2" onchange="checkDuplicates(this)">
+        <input type="number" id="num3" onchange="checkDuplicates(this)">
+        <input type="number" id="num4" onchange="checkDuplicates(this)">
+        <input type="number" id="num5" onchange="checkDuplicates(this)">
+        <input type="number" id="num6" onchange="checkDuplicates(this)">
+        <button onclick="tahmin()" id="tahminbutton">Tahmin gir</button>
+        <div id="message">Tahminler girildi.</div><br>
+    </div>
+    <br>
+    <hr>
+    <button onclick="kura()" id="kurayiCek" disabled>Kurayı Çek</button>
+
+    <p>Loto Sayıları</p>
+
+    <div id="box2">
+        <input type="number" id="tnum1" disabled>
+        <input type="number" id="tnum2" disabled>
+        <input type="number" id="tnum3" disabled>
+        <input type="number" id="tnum4" disabled>
+        <input type="number" id="tnum5" disabled>
+        <input type="number" id="tnum6" disabled>
+        <div id="bilinenNum"></div>
+    </div>
+
+    <script>
+
+        function checkInputFormat(num) {
+            if (num < 1 || num > 49) {
+                return false;
+            }
+
+            var numString = num.toString();
+            if (numString.includes('.') || numString.includes(',')) {
+                alert("Ondalık veya virgül içeren sayılar kabul edilmez.");
+                return false;
+            }
+            return true;
+        }
+
+
+        function tahmin() {
+            var num1 = document.getElementById("num1").value.trim();
+            var num2 = document.getElementById("num2").value.trim();
+            var num3 = document.getElementById("num3").value.trim();
+            var num4 = document.getElementById("num4").value.trim();
+            var num5 = document.getElementById("num5").value.trim();
+            var num6 = document.getElementById("num6").value.trim();
+
+            if (num1 === "" || num2 === "" || num3 === "" || num4 === "" || num5 === "" || num6 === "") {
+                alert("Tüm alanları doldurunuz.");
+                return;
+            }
+
+            if (!checkInputFormat(num1) || !checkInputFormat(num2) || !checkInputFormat(num3) || !checkInputFormat(num4) || !checkInputFormat(num5) || !checkInputFormat(num6)) {
+                alert("1-49 sayıları arasında bir sayı girmelisiniz");
+                return;
+            }
+
+            var parsedNum1 = parseInt(num1);
+            var parsedNum2 = parseInt(num2);
+            var parsedNum3 = parseInt(num3);
+            var parsedNum4 = parseInt(num4);
+            var parsedNum5 = parseInt(num5);
+            var parsedNum6 = parseInt(num6);
+
+            if (isNaN(parsedNum1) || isNaN(parsedNum2) || isNaN(parsedNum3) || isNaN(parsedNum4) || isNaN(parsedNum5) || isNaN(parsedNum6)) {
+                alert("Geçerli tam sayılar giriniz.");
+                return;
+            }
+
+            if (parsedNum1 < 1 || parsedNum1 > 49 || parsedNum2 < 1 || parsedNum2 > 49 || parsedNum3 < 1 || parsedNum3 > 49 || parsedNum4 < 1 || parsedNum4 > 49 || parsedNum5 < 1 || parsedNum5 > 49 || parsedNum6 < 1 || parsedNum6 > 49) {
+                alert("1-49 aralığında geçerli sayılar giriniz.");
+                return;
+            }
+
+            var numbers = [parsedNum1, parsedNum2, parsedNum3, parsedNum4, parsedNum5, parsedNum6];
+
+            var uniqueNumbers = [...new Set(numbers)].sort((a, b) => a - b);
+
+            for (var i = 0; i < uniqueNumbers.length; i++) {
+                document.getElementById("num" + (i + 1)).value = uniqueNumbers[i];
+            }
+
+            document.getElementById("tahminbutton").disabled = true;
+            document.getElementById("kurayiCek").disabled = false;
+            document.getElementById("message").style.display = "block";
+        }
+
+        function checkDuplicates(input) {
+            var value = input.value;
+            var id = input.id;
+
+            var inputs = document.querySelectorAll('#box input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].id !== id && inputs[i].value === value) {
+                    alert("Aynı tahmin bir kez girilebilir.");
+                    input.value = '';
+                    return;
+                }
+            }
+        }
+
+        function kura() {
+            var lotoNumbers = generateRandomNumbers();
+            lotoNumbers.sort((a, b) => a - b);
+            for (var i = 0; i < lotoNumbers.length; i++) {
+                document.getElementById("tnum" + (i + 1)).value = lotoNumbers[i];
+            }
+
+            var girilenSayilar = [parseInt(document.getElementById("num1").value), parseInt(document.getElementById("num2").value), parseInt(document.getElementById("num3").value), parseInt(document.getElementById("num4").value), parseInt(document.getElementById("num5").value), parseInt(document.getElementById("num6").value)];
+            var bilinenNum = [];
+
+            for (var i = 0; i < lotoNumbers.length; i++) {
+                if (girilenSayilar.includes(lotoNumbers[i])) {
+                    bilinenNum.push(lotoNumbers[i]);
+                }
+            }
+
+            var bilinenNumLabel = document.getElementById("bilinenNum");
+            var bilinenSayiAdedi = bilinenNum.length;
+            var adetMetni = bilinenSayiAdedi === 1 ? "adet sayı" : "adet sayı";
+            bilinenNumLabel.innerHTML = "<span id='bilinenNumLabel'>Bilinen Sayılar:</span> " + bilinenNum.join(", ") + "<br>" + bilinenSayiAdedi + " " + adetMetni + " bildiniz.";
+            bilinenNumLabel.style.display = "block";
+        }
+
+        function generateRandomNumbers() {
+            var numbers = [];
+            while (numbers.length < 6) {
+                var randomNum = Math.floor(Math.random() * 49) + 1;
+                if (!numbers.includes(randomNum)) {
+                    numbers.push(randomNum);
+                }
+            }
+            return numbers;
+        }
+
+    </script>
+</body>
+
+</html>
